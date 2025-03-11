@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Define standard ANSI colors
+declare -A colors=(
+    ["black"]="30"  ["red"]="31"    ["green"]="32"  ["yellow"]="33"
+    ["blue"]="34"   ["magenta"]="35" ["cyan"]="36"  ["white"]="37"
+    ["bright_black"]="90"  ["bright_red"]="91"    ["bright_green"]="92"
+    ["bright_yellow"]="93" ["bright_blue"]="94"   ["bright_magenta"]="95"
+    ["bright_cyan"]="96"   ["bright_white"]="97"
+)
+
+# Default colors
+default_line_color="red"
+default_match_color="green"
+
+# Function to print usage
+usage() {
+    echo "Usage: hilite [-l line_color] [-m match_color] 'pattern'"
+    echo "Available colors: ${!colors[@]}"
+    exit 1
+}
+
+# Parse options
+while getopts "l:m:" opt; do
+    case ${opt} in
+        l) line_color="$OPTARG" ;;
+        m) match_color="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND -1))
+
+# Ensure a pattern is provided
+if [ -z "$1" ]; then
+    usage
+fi
+
+pattern="$1"
+
+# Use default colors if not set by options
+line_color="${line_color:-$default_line_color}"
+match_color="${match_color:-$default_match_color}"
+
+# Validate colors
+if [[ -z "${colors[$line_color]}" || -z "${colors[$match_color]}" ]]; then
+    echo "Error: Invalid color name."
+    usage
+fi
+
+awk -v pat="$pattern" -v line_color="${colors[$line_color]}" -v match_color="${colors[$match_color]}" '
+{
+    if ($0 ~ pat) {
+        printf "\033[2;" line_color "m";  # Apply whole line color (dim)
+        gsub(pat, "\033[1;" match_color "m&\033[2;" line_color "m");  # Highlight match
+        print $0 "\033[0m";  # Print modified line and reset color
+    } else {
+        print $0;  # Print unchanged lines
+        fflush();
+    }
+}'
