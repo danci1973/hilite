@@ -7,8 +7,8 @@ Made with help of ChatGPT. :)
 ```sh
 wget -O hilite https://raw.githubusercontent.com/YOUR_USERNAME/hilite/main/hilite
 chmod +x hilite
-mv hilite /usr/local/bin/MIT License.
-
+mv hilite /usr/local/bin/
+```
 
 
 ## Usage
