@@ -9,3 +9,9 @@ chmod +x hilite
 mv hilite /usr/local/bin/
 
 Made with help of ChatGPT. :)
+
+## Usage
+```tail -f logfile | hilite -l blue -m bright_cyan "error"
+
+## Licence
+MIT License.
